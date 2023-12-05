@@ -1,57 +1,53 @@
-// WiFi parameter
-let SERVER_ADDRESS = "http://10.10.81.101/data";
+// WiFi 参数
+let SERVER_ADDRESS = "http://192.168.1.174/data";
 
-// WiFi variable
-let readyToLoad;
+// WiFi 变量
+let readyToLoad = true;
 
-// project variables
+// 项目变量
 let mPlayer = {
-  x: 0,
-  y: 0,
-  diameter: 0,
+  x: 50,  // 初始 X 位置
+  y: 50,  // 初始 Y 位置
+  diameter: 40,  // 初始直径
 };
 
 function parseData(res) {
-  // get data from WiFi response
+  console.log("Received data:", res); // 打印接收到的整个响应数据
+
   let data = res.data;
-  let a0 = data.A0;
-  let d2 = data.D2;
+  let d3 = data.D3.isPressed;
+  let d4 = data.D4.isPressed;
 
-  // use data to update project variables
-  mPlayer.x = map(a0.value, 0, 4095, 0, width);
-  mPlayer.diameter = map(d2.count, 0, 20, 20, 80);
+  console.log('D3:', d3, 'D4:', d4); // 打印具体的按钮状态
 
-  if (d2.isPressed) {
-    mPlayer.y -= 100;
-  } else if (mPlayer.y < height - 100) {
-    mPlayer.y += 16;
+  if (d3) {
+    mPlayer.x -= 10; // 向左移动
+  } 
+  if (d4) {
+    mPlayer.x += 10; // 向右移动
   }
 
-  // WiFi update
-  readyToLoad = true;
+  mPlayer.x = constrain(mPlayer.x, 0, width); // 确保圆形不会离开画布边界
+
+  readyToLoad = true; // 设置为 true，以便在下一次 draw 循环中再次加载数据
 }
 
 function setup() {
-  // project setup
+  // 初始化项目
   createCanvas(windowWidth, windowHeight);
-  mPlayer = {
-    x: 0,
-    y: height - 100,
-    diameter: 20,
-  };
-
-  // WiFi setup
-  readyToLoad = true;
+  mPlayer.y = height / 2;  // 将方块的 Y 位置设置在画布中间
+  console.log('Setup completed');  // 打印初始化完成信息
 }
 
 function draw() {
-  // project code
   background(220, 20, 120);
-  ellipse(mPlayer.x, mPlayer.y, mPlayer.diameter, mPlayer.diameter);
-
-  // WiFi update
+  ellipse(mPlayer.x, mPlayer.y, mPlayer.diameter);
+  // console.log(readyToLoad);
   if (readyToLoad) {
     readyToLoad = false;
-    loadJSON(SERVER_ADDRESS, parseData);
+    console.log("Requesting data..."); // 打印请求发出的信息
+    loadJSON(SERVER_ADDRESS, parseData, function(err) {
+      console.error("Error loading JSON: ", err); // 错误处理
+    });
   }
 }
