@@ -4,17 +4,17 @@
 
 #include <ArduinoJson.h>
 
-#include "config.h" // 确保您有一个config.h文件包含SSID和SSID_PASSWORD
+#include "config.h" 
 const char* SSID = "Verizon_R3S4K9";
 const char* SSID_PASSWORD = "churn6-boa-hale";
-// WiFi 代码
+
 WebServer server(80);
 
-// 项目变量
+
 int a0Val = 0;
 int d2Val = 0;
-int d3Val = 0; // D3按钮状态
-int d4Val = 0; // D4按钮状态
+int d3Val = 0; // D3
+int d4Val = 0; // D4
 int d2ClickCount = 0;
 
 int prevD2Val = 0;
@@ -75,25 +75,25 @@ void setup() {
 
   // 项目设置
   pinMode(2, INPUT);
- pinMode(3, INPUT_PULLUP); // 初始化D3
+ pinMode(3, INPUT_PULLUP); 
   pinMode(4, INPUT_PULLUP);
 }
 
 void loop() {
-  // 读取引脚
+
   a0Val = analogRead(A0);
   d2Val = digitalRead(2);
  d3Val = digitalRead(3) == LOW;
   d4Val = digitalRead(4) == LOW;
 
-  // 计算D2是否被点击
+
   if (d2Val && d2Val != prevD2Val) {
     d2ClickCount++;
   }
 
   prevD2Val = d2Val;
 
-  // WiFi 代码
+
   server.handleClient();
   delay(2);
 
